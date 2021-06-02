@@ -22,8 +22,8 @@ Logo após, é necessário editar um arquivo de configuração para conexão ao 
   "development": {
     "username": "Seu Usuário Aqui",
     "password": "Sua Senha Aqui",
-    "database": "vxn50mMAYD",
-    "host": "Seu Bando De Dados Aqui",
+    "database": "Seu Bando De Dados Aqui",
+    "host": "Seu Host Aqui",
     "dialect": "mysql"
   }
 ```
