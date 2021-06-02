@@ -5,6 +5,17 @@
   "scripts": {
     "start": "node ./bin/www"
   },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/thiago220/smarkio.git"
+  },
+  "keywords": [],
+  "author": "Thiago Souza Dias",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/thiago220/smarkio/issues"
+  },
+  "homepage": "https://github.com/thiago220/smarkio#readme",
   "dependencies": {
     "cookie-parser": "~1.4.4",
     "debug": "~2.6.9",

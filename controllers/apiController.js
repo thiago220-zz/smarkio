@@ -18,7 +18,6 @@ var synthesizeParams = {
 };
 
 exports.getAudio = async (req, res, next) => {
-    console.log("TEXT:" + req.body.text);
     synthesizeParams.text = req.body.text;
     await textToSpeech.synthesize(synthesizeParams).then(response => {
         return textToSpeech.repairWavHeaderStream(response.result);
@@ -42,5 +41,5 @@ exports.addComment = async function (req, res) {
         createdAt: Date.now(),
         updatedAt: Date.now(),
     });
-    res.status(200).json({ message: "Mensagem inserida com sucesso", text: req.body.commentInput });
+    res.status(200).json({ message: "Mensagem inserida com sucesso", text: resultadoCreate.text, id: resultadoCreate.id  });
 };

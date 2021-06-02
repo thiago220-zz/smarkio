@@ -99,14 +99,16 @@
               });
               $("form#formComment").on('submit', (e) => {
                 $('div#messageStatus').empty()
+                $('ul#commentList').append("<li class='list-group-item list-group-item-action'>"+
+                  "<div id='spinnerAddComment' class='spinner-border' role='status'></div></li>");
                 e.preventDefault()
                 $.ajax({
                   url: '/api/addcomment',
                   type: 'POST',
                   data: $("form#formComment").serialize()
                 }).done(data => {
+                  $("#spinnerAddComment").remove();
                   $("#emptyList").remove();
-                  var timestamp = new Date(2013, 11, 17).getTime().toString();
                   $("ul#commentList").append(
                     "<li class='list-group-item list-group-item-action'>" +
                     "<div class='row align-items-center'>" +
@@ -114,7 +116,7 @@
                     "<p>" + data['text'] + "</p>" +
                     "</div>" +
                     "<div class='col-3'>" +
-                    "<button id='" + timestamp + "' cvalue='" + data['text'] + "' type='submit' class='btn btn-success d-block mx-auto listen'>Ouvir</button>" +
+                    "<button id='" + data['id'] + "' cvalue='" + data['text'] + "' type='submit' class='btn btn-success d-block mx-auto listen'>Ouvir</button>" +
                     "</div>" +
                     "</div>" +
                     "</li>");
@@ -124,9 +126,10 @@
                     data['message'] +
                     "</div>");
 
-                  attachEvent(timestamp);
+                  attachEvent(data['id']);
                 }).error(
                   data => {
+                    $("#spinnerAddComment").remove();
                     $('div#messageStatus').append(
                       "<div class='alert alert-danger' role='alert'>" +
                       data['message'] +

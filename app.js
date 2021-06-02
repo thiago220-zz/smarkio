@@ -40,4 +40,6 @@ app.use(function(err, req, res, next) {
   res.render('error');
 });
 
+console.log("API ON-LINE");
+
 module.exports = app;
