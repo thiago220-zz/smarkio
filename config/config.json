@@ -1,0 +1,9 @@
+{
+  "development": {
+    "username": "vxn50mMAYD",
+    "password": "Yq1vfTBMjA",
+    "database": "vxn50mMAYD",
+    "host": "remotemysql.com",
+    "dialect": "mysql"
+  }
+}

@@ -1,0 +1,194 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+  <!-- Required meta tags -->
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate" />
+  <meta http-equiv="Pragma" content="no-cache" />
+  <meta http-equiv="Expires" content="0" />
+
+  <!-- Bootstrap CSS -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0-beta3/dist/css/bootstrap.min.css" rel="stylesheet"
+    integrity="sha384-eOJMYsd53ii+scO/bJGFsiCZc+5NDVN2yr8+0RDqr0Ql0h+rP48ckxlpbzKgwra6" crossorigin="anonymous">
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+  <title>Teste Smarkio</title>
+
+  <style>
+    .loader {
+      border: 16px solid #f3f3f3;
+      border-radius: 50%;
+      border-top: 16px solid #3498db;
+      width: 120px;
+      height: 120px;
+      margin: 50px auto;
+      -webkit-animation: spin 2s linear infinite;
+      /* Safari */
+      animation: spin 2s linear infinite;
+    }
+
+    /* Safari */
+    @-webkit-keyframes spin {
+      0% {
+        -webkit-transform: rotate(0deg);
+      }
+
+      100% {
+        -webkit-transform: rotate(360deg);
+      }
+    }
+
+    @keyframes spin {
+      0% {
+        transform: rotate(0deg);
+      }
+
+      100% {
+        transform: rotate(360deg);
+      }
+    }
+  </style>
+</head>
+
+<body>
+  <main class="p-3">
+    <h1 class="text-center">SMARKIO</h1>
+    <h2 class="text-center">Teste prático de programação</h2>
+    <audio id="player" class="d-none" controls>
+      <source id="audio-source" src="" type="audio/wav">
+      Your browser does not support the audio tag.
+    </audio>
+    <div class="container">
+      <div class="row pt-5">
+        <div class="col">
+          <h3>Comentário</h3>
+          <form id="formComment" class="row">
+            <div class="col-12 mb-3">
+              <textarea class="form-control" id="commentInput" name="commentInput" rows="3"></textarea>
+            </div>
+            <div class="col-12">
+              <button id="btnSubmit" type="submit" class="btn btn-primary mb-3 d-block mx-auto"
+                disabled>Cadastrar</button>
+            </div>
+          </form>
+          <div id="messageStatus"></div>
+          <script>
+            function attachEvent(id) {
+              $("button#" + id).on("click", () => {
+                $.ajax({
+                  type: 'POST',
+                  url: '/api/getaudio',
+                  data: { id: id, text: $("button#" + id).attr("cvalue").toString() },
+                  success: function (data) {
+                    var source = document.getElementById('audio-source');
+                    source.src = "audios/" + data['audio'];
+                    var audio = document.getElementById("player");
+                    audio.load();
+                    audio.play();
+                  }
+                });
+              });
+            }
+            $(document).ready(function () {
+              $("textarea#commentInput").on("change keyup paste", () => {
+                if (!$.trim($("textarea#commentInput").val()))
+                  $("button#btnSubmit").prop('disabled', true);
+                else
+                  $("button#btnSubmit").prop('disabled', false);
+              });
+              $("form#formComment").on('submit', (e) => {
+                $('div#messageStatus').empty()
+                e.preventDefault()
+                $.ajax({
+                  url: '/api/addcomment',
+                  type: 'POST',
+                  data: $("form#formComment").serialize()
+                }).done(data => {
+                  $("#emptyList").remove();
+                  var timestamp = new Date(2013, 11, 17).getTime().toString();
+                  $("ul#commentList").append(
+                    "<li class='list-group-item list-group-item-action'>" +
+                    "<div class='row align-items-center'>" +
+                    "<div class='col-9'>" +
+                    "<p>" + data['text'] + "</p>" +
+                    "</div>" +
+                    "<div class='col-3'>" +
+                    "<button id='" + timestamp + "' cvalue='" + data['text'] + "' type='submit' class='btn btn-success d-block mx-auto listen'>Ouvir</button>" +
+                    "</div>" +
+                    "</div>" +
+                    "</li>");
+
+                  $('div#messageStatus').append(
+                    "<div class='alert alert-success' role='alert'>" +
+                    data['message'] +
+                    "</div>");
+
+                  attachEvent(timestamp);
+                }).error(
+                  data => {
+                    $('div#messageStatus').append(
+                      "<div class='alert alert-danger' role='alert'>" +
+                      data['message'] +
+                      "</div>");
+                  });
+              });
+            });
+
+          </script>
+        </div>
+        <div class="col">
+          <h3>Comentários</h3>
+          <div id="commentPanel">
+            <ul id='commentList' class='list-group'>
+              <div class="spinner-border" role="status">
+              </div>
+            </ul>
+          </div>
+          <script>
+            $(document).ready(function () {
+              $.ajax({
+                type: "GET",
+                url: '/api/allcomments',
+                success: function (data) {
+                  $("ul#commentList").empty();
+                  if (data.length > 0) {
+                    data.forEach(function (el, i) {
+                      $("ul#commentList").append(
+                        "<li class='list-group-item list-group-item-action'>" +
+                        "<div class='row align-items-center'>" +
+                        "<div class='col-9'>" +
+                        "<p>" + el['text'] + "</p>" +
+                        "</div>" +
+                        "<div class='col-3'>" +
+                        "<button id='" + el['id'] + "' cvalue='" + el['text'] + "' type='submit' class='btn btn-success d-block mx-auto'>Ouvir</button>" +
+                        "</div>" +
+                        "</div>" +
+                        "</li>");
+                      attachEvent(el['id']);
+                    });
+                  } else {
+                    $("ul#commentList").append("<div id='emptyList' class='alert alert-warning' role='alert'>Nenhum comentário foi encontrado</div>");
+                  }
+                },
+                error: function (data) {
+                  console.log(data);
+                }
+              });
+
+            });
+
+
+          </script>
+        </div>
+      </div>
+    </div>
+  </main>
+  <footer>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0-beta3/dist/js/bootstrap.bundle.min.js"
+      integrity="sha384-JEW9xMcG8R+pH31jmWH6WWP0WintQrMb4s7ZOdauHnUtxwoG2vI5DkLtS3qm9Ekf"
+      crossorigin="anonymous"></script>
+  </footer>
+</body>
+
+</html>
